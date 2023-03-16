@@ -1,35 +1,41 @@
-import { z } from "zod";
+export interface Profile {
+  id: string;
+  name: string;
+}
 
-export const Profile = z.object({
-  id: z.string().uuid(),
-  name: z.string()
-});
-export type Profile = z.infer<typeof Profile>;
+interface QuestionBase {
+  id: string;
+  type: "Text" | "Number" | "Choice";
+  text: string;
+  isIdentificationField: boolean;
+  isRequired: boolean;
+}
 
-const QuestionBase = z.object({
-  id: z.string().uuid(),
-  type: z.enum(["Text", "Number", "Choice"]),
-  text: z.string(),
-  isIdentificationField: z.boolean(),
-  isRequired: z.boolean()
-});
-type QuestionBase = z.infer<typeof QuestionBase>;
+export interface TextQuestion extends QuestionBase {
+  type: "Text";
+}
 
-export const TextQuestion = QuestionBase.extend({
-  type: z.literal("Text")
-});
-export type TextQuestion = z.infer<typeof TextQuestion>;
+export interface NumberQuestion extends QuestionBase {
+  type: "Number";
+}
 
-export const ChoiceQuestion = QuestionBase.extend({
-  type: z.literal("Choice"),
-  choices: z.array(z.string())
-});
-export type ChoiceQuestion = z.infer<typeof ChoiceQuestion>;
+export interface ChoiceQuestion extends QuestionBase {
+  type: "Choice";
+  choices: string[];
+}
 
-export const NumberQuestion = QuestionBase.extend({
-  type: z.literal("Number")
-});
-export type NumberQuestion = z.infer<typeof ChoiceQuestion>;
+export type Question = TextQuestion | NumberQuestion | ChoiceQuestion;
 
-export const Question = ChoiceQuestion.or(NumberQuestion).or(TextQuestion);
-export type Question = z.infer<typeof Question>;
+export type Answer = string;
+// export type Answer<T extends Question = Question> = T extends
+//   | TextQuestion
+//   | ChoiceQuestion
+//   ? string // A Text and Choice question both have a string answer
+//   : number;
+
+export type Answers = { [questionKey: string]: Answer };
+
+export type Visitor = {
+  id: string;
+  fields: { questionId: string; value: string }[];
+};

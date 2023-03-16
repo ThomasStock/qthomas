@@ -1,18 +1,20 @@
 import axios from "axios";
 import endpoint from "./_utils/endpoint";
-import z from "zod";
 import { Question } from "./types";
 
-const GetProfileResponse = z.object({
-  questions: z.array(Question)
-});
+type GetProfileResponse = {
+  questions: Question[];
+};
 
 const getProfile = async (profileId: string) => {
-  const response = await axios.get(endpoint(`profiles/{id}/questionary`), {
-    params: { profileId }
-  });
-  const parsed = GetProfileResponse.parse(response.data);
-  return parsed.questions;
+  const response = await axios.get<GetProfileResponse>(
+    // backend endpoint seems to be wrong so I must hardcode the string "{id}"
+    endpoint(`profiles/{id}/questionary`),
+    {
+      params: { profileId }
+    }
+  );
+  return response.data.questions;
 };
 
 export default getProfile;
