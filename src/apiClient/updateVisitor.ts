@@ -1,11 +1,9 @@
 import axios from "axios";
 import endpoint from "./_utils/endpoint";
-import { Answers } from "./types";
+import { SaveVisitorParams } from "./createVisitor";
 
-type UpdateVisitorParams = {
+type UpdateVisitorParams = SaveVisitorParams & {
   visitorId: string;
-  profileId: string;
-  answers: Answers;
 };
 
 const updateVisitor = async (params: UpdateVisitorParams) => {

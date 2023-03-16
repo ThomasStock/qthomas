@@ -33,7 +33,7 @@ export type Answer = string;
 //   ? string // A Text and Choice question both have a string answer
 //   : number;
 
-export type Answers = { [questionKey: string]: Answer };
+export type Answers = { [questionKey: string]: Answer | undefined };
 
 export type Visitor = {
   id: string;

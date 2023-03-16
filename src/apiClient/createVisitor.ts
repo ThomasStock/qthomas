@@ -2,9 +2,9 @@ import axios from "axios";
 import endpoint from "./_utils/endpoint";
 import { Answers } from "./types";
 
-type createVisitorParams = { profileId: string; answers: Answers };
+export type SaveVisitorParams = { profileId: string; answers: Answers };
 
-const createVisitor = async (params: createVisitorParams) => {
+const createVisitor = async (params: SaveVisitorParams) => {
   const { profileId, answers } = params;
 
   await axios.post(endpoint(`visitors`), {

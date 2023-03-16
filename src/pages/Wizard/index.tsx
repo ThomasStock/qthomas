@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "react-query";
+import { useState } from "react";
+import { useQuery } from "react-query";
 import getProfile from "../../apiClient/getProfile";
-import getVisitor from "../../apiClient/getVisitor";
-import updateVisitorApi from "../../apiClient/updateVisitor";
-import createVisitorApi from "../../apiClient/createVisitor";
 import useQuestionaryStore from "../../store";
 import WizardStep from "./WizardStep";
 import { Answers } from "../../apiClient/types";
 import Button from "../../ui-components/Button";
+import useVisitor from "../../hooks/useVisitor";
+import getIdentifierData from "./getIdentifierData";
 
 const Wizard = () => {
   const profileId = useQuestionaryStore((state) => state.profileId);
@@ -22,24 +21,12 @@ const Wizard = () => {
     { enabled: !!profileId }
   );
 
-  const { mutate: createVisitor } = useMutation({
-    mutationFn: createVisitorApi
-  });
-  const { mutate: updateVisitor } = useMutation({
-    mutationFn: updateVisitorApi
-  });
-
-  const firstQuestion = questions?.[0];
-  const identifier = firstQuestion?.isIdentificationField
-    ? answers?.[firstQuestion.id]
-    : undefined;
-
-  const { data: visitorData } = useQuery(
-    ["visitor", identifier],
-    () => getVisitor(firstQuestion!.id, identifier!.toString()),
-    { enabled: !!identifier }
-  );
-  const { answers: serverAnswers, visitorId } = visitorData || {};
+  const indentifierData = getIdentifierData(questions, answers);
+  const {
+    saveVisitor,
+    answers: serverAnswers,
+    isSaved
+  } = useVisitor(indentifierData);
 
   if (!profileId || !questions) {
     return null;
@@ -50,6 +37,9 @@ const Wizard = () => {
   const showConfirmationMessage = questionIndex >= questions.length;
 
   if (showConfirmationMessage) {
+    if (!isSaved) {
+      return <div>Saving...</div>;
+    }
     return (
       <div>
         <p>All done! Thanks!</p>
@@ -60,14 +50,12 @@ const Wizard = () => {
   const question = questions[questionIndex];
 
   const handleAnswer = (value: string) => {
-    setAnswers({ ...answers, [question.id]: value });
+    const updatedAnswers = { ...answers, [question.id]: value };
+
+    setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
-      if (!visitorId) {
-        createVisitor({ profileId, answers: answers! });
-      } else {
-        updateVisitor({ visitorId, profileId, answers: answers! });
-      }
+      saveVisitor({ profileId, answers: updatedAnswers });
     }
 
     setQuestionIndex((i) => i + 1);
