@@ -1,6 +1,6 @@
 import useQuestionaryStore from "../../store";
 import ProfileChoice from "../ProfileChoice";
-import Wizard from "../Wizard";
+import Questionary from "../Questionary";
 import HomeButton from "./HomeButton";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="max-w-4xl min-w-2xl shadow-lg bg-white m-12 p-6 grow items-center">
       <header className="h-28">{profileId ? <HomeButton /> : null}</header>
-      {profileId ? <Wizard /> : <ProfileChoice />}
+      {profileId ? <Questionary /> : <ProfileChoice />}
     </div>
   );
 }

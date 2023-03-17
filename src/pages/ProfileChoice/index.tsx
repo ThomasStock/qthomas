@@ -5,7 +5,7 @@ import ProfileButton from "./ProfileButton";
 const ProfileChoice = () => {
   const { isLoading, data: profiles } = useQuery("profiles", getProfiles);
 
-  if (isLoading) return <div>"Loading..."</div>;
+  if (isLoading) return null;
 
   return (
     <ul className="flex flex-col w-full items-center">

@@ -6,11 +6,17 @@ type GetVisitorResponse = {
   visitors: Visitor[];
 };
 
-const getVisitor = async (questionId: string, answer: string) => {
+export type GetVisitorParams = { questionId: string; answer: string };
+
+const getVisitor = async ({ questionId, answer }: GetVisitorParams) => {
   const response = await axios.get<GetVisitorResponse>(
     endpoint(`visitors?fieldFilter=${questionId} eq ${answer}`)
   );
   const visitor = response.data.visitors[0];
+
+  if (!visitor) {
+    return undefined;
+  }
 
   const answers = visitor.fields.reduce((agg, { questionId, value }) => {
     agg[questionId] = value;

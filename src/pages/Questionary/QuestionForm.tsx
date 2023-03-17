@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Question } from "../../apiClient/types";
 import Button from "../../ui-components/Button";
+import RadioButton from "../../ui-components/RadioButton";
+import TextInput from "../../ui-components/TextInput";
 
-interface WizardStepProps {
+interface QuestionFormProps {
   question: Question;
   answer: string | undefined;
+  confirmButtonLabel: string;
   onChange: (value: string) => void;
 }
 
-const WizardStep = (props: WizardStepProps) => {
-  const { question, onChange, answer } = props;
+const QuestionForm = (props: QuestionFormProps) => {
+  const { question, onChange, answer, confirmButtonLabel } = props;
   const { text, type } = question;
+
+  const id = useId();
 
   const [answerInput, setAnswerInput] = useState(answer);
 
@@ -21,31 +26,35 @@ const WizardStep = (props: WizardStepProps) => {
 
   const isValid = !question.isRequired || !!answerInput;
 
+  const handleEntry = (value: string) => {
+    if (type === "Number") {
+      if (isNaN(value as any)) {
+        return;
+      }
+    }
+    setAnswerInput(value);
+  };
+
   return (
     <div className="flex flex-col grow-0 items-center">
       <span className="mb-3">{text}</span>
       {type === "Choice" ? (
         <div className="flex flex-col items-start mb-6">
           {question.choices.map((choice) => (
-            <label key={choice}>
-              <input
-                type="radio"
-                id={choice}
-                name="choice"
-                value={choice}
-                className="mr-3 self-start"
-                checked={choice === answerInput}
-                onChange={() => setAnswerInput(choice)}
-              />
-              {choice}
-            </label>
+            <RadioButton
+              key={choice}
+              group={`${id}_choice`}
+              value={choice}
+              checked={choice === answerInput}
+              onChange={() => setAnswerInput(choice)}
+            />
           ))}
         </div>
       ) : (
-        <input
+        <TextInput
           value={answerInput ?? ""}
-          onChange={(e) => setAnswerInput(e.target.value)}
-          className="p-1 m-1 mb-6 bg-slate-300 shadow grow-0"
+          onChange={(e) => handleEntry(e.target.value)}
+          className="mb-6"
         />
       )}
 
@@ -54,10 +63,10 @@ const WizardStep = (props: WizardStepProps) => {
         disabled={!isValid}
         onClick={() => onChange(answerInput ?? "")}
       >
-        Next
+        {confirmButtonLabel}
       </Button>
     </div>
   );
 };
 
-export default WizardStep;
+export default QuestionForm;
