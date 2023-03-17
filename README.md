@@ -2,6 +2,9 @@ NOTE: I'm using port 8000 instead of 5000 for the backend because 5000 was in us
 
 You can change to 5000 in src/apiClient/\_utils/endpoint.ts
 
+To run app: `npm run dev`
+It should output a localhost url for you.
+
 ## State management library
 
 Honestly the only reason why I'm using Zustand (for a small part of the state) is because you specifically asked for a state management library.  
